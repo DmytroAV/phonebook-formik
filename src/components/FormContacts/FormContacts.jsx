@@ -11,7 +11,7 @@ const numberRegex = /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4
 const numberTitle =
   'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +';
 
-const userSchema = yup.object().shape({
+const validationSchema = yup.object().shape({
   name: yup
     .string()
     .max(20)
@@ -40,7 +40,11 @@ export const FormContacts = ({ onSubmit }) => {
     resetForm();
   };
   return (
-    <Formik initialValues={initialValues} validationSchema={userSchema} onSubmit={handleSubmit}>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
       <ContainerForm
       // autoComplete="off"
       >

@@ -7,6 +7,7 @@ import { FormContacts } from './FormContacts/FormContacts';
 import { Contacts } from './Contacts/Contacts';
 import { Section } from './Section/Section';
 import { GlobalStyle } from './GlobalStyle';
+import items from './json/contacts.json';
 
 const notifyOptions = {
   position: 'top-right',
@@ -18,16 +19,32 @@ const notifyOptions = {
   progress: undefined,
   theme: 'colored',
 };
+
+const LS_KEY = 'phonebook_contacts';
+
 class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
   };
+
+  componentDidMount() {
+    const contacts_LS = JSON.parse(localStorage.getItem(LS_KEY));
+
+    if (contacts_LS !== null) {
+      this.setState({ contacts: contacts_LS });
+    }
+
+    if (!contacts_LS || contacts_LS.length === 0) {
+      localStorage.setItem(LS_KEY, JSON.stringify(items));
+      this.setState({ contacts: items });
+    }
+  }
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem(LS_KEY, JSON.stringify(this.state.contacts));
+    }
+  }
 
   createContact = ({ name, number }) => {
     const { contacts } = this.state;
@@ -56,7 +73,10 @@ class App extends Component {
   addFilterContacts = () => {
     const { filter, contacts } = this.state;
     const normalFilter = filter.toLowerCase();
-    return contacts.filter(({ name }) => name.toLowerCase().includes(normalFilter));
+    if (contacts) {
+      return contacts.filter(({ name }) => name.toLowerCase().includes(normalFilter));
+    }
+    return;
   };
 
   deleteContact = contactId => {
@@ -76,7 +96,7 @@ class App extends Component {
             <FormContacts onSubmit={this.createContact} />
           </Section>
           <Section title="Contacts">
-            {contacts.length !== 0 ? (
+            {contacts ? (
               <Contacts
                 items={filteredContacts}
                 onChange={this.handleFilterChange}
